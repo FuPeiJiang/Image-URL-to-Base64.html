@@ -16,6 +16,23 @@
             display: block;
             margin-bottom: 7px;
         }
+
+
+        .hide-opacity {
+            opacity: 0;
+        }
+
+        /* https://stackoverflow.com/questions/15907079/css3-transition-fade-out-effect#16611735 */
+        .fadeOut {
+            /* transition: opacity 2s linear; */
+            transition: opacity 2s ease-in-out;
+        }
+
+        #copiedToClipboard {
+            font-size: 100px;
+            /* color: greenyellow; */
+            /* color: 	#B3EB42; */
+        }
     </style>
 </head>
 
@@ -23,10 +40,12 @@
 <body>
     <label for="enterURL">Image URL:</label>
     <textarea style="font-size: 30px; height: 5em;" id="enterURL" cols="100" rows="1"></textarea>
+    <p id="copiedToClipboard" class="hide-opacity fadeOut">Copied to clipboard!</p>
 
     <script>
 
         var enterURL = document.getElementById("enterURL")
+        var copiedToClipboard = document.getElementById("copiedToClipboard")
 
         function getBase64ImageFromURL(url) {
 
@@ -53,10 +72,80 @@
 
         enterURL.onpaste = function () {
             setTimeout(async function () {
-                console.log(await getBase64ImageFromURL(enterURL.value))
+                var base64Str = await getBase64ImageFromURL(enterURL.value)
+
+                var copySucceeded = await copyTextToClipboard(base64Str)
+                if (copySucceeded) {
+
+
+                    asyncFadeOut(copiedToClipboard)
+
+                }
+
+                console.log(base64Str)
+
+
             }, 1)
         }
 
+        //start of functions
+        async function asyncFadeOut(element) {
+            element.classList.remove("fadeOut")
+            element.style.opacity = 1
+            
+            setTimeout(function () {
+                element.classList.add("fadeOut")
+                element.style.opacity = 0
+            }, 0)
+        }
+        // https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript#30810322
+        function fallbackCopyTextToClipboard(text) {
+            var textArea = document.createElement("textarea")
+            textArea.value = text
+
+            // Avoid scrolling to bottom
+            textArea.style.top = "0"
+            textArea.style.left = "0"
+            textArea.style.position = "fixed"
+
+            document.body.appendChild(textArea)
+            textArea.focus()
+            textArea.select()
+
+            try {
+                var successful = document.execCommand('copy')
+                var msg = successful ? 'successful' : 'unsuccessful'
+                // console.log('Fallback: Copying text command was ' + msg)
+                return true
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err)
+                return false
+            }
+
+            document.body.removeChild(textArea)
+        }
+        function copyTextToClipboard(text) {
+            // true if copySucceeded, false if error
+
+            return new Promise(resolve => {
+                if (!navigator.clipboard) {
+                    resolve(fallbackCopyTextToClipboard(text))
+                    return
+                }
+                navigator.clipboard.writeText(text).then(function () {
+                    // console.log('Async: Copying to clipboard was successful!')
+                    resolve(true)
+                    return
+                }, function (err) {
+                    console.error('Async: Could not copy text: ', err)
+                    resolve(false)
+                    return
+                })
+            })
+
+
+        }
+        // copyTextToClipboard("Bob")
     </script>
 </body>
 
