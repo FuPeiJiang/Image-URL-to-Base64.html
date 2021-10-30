@@ -6,7 +6,6 @@
     <title>Image URL to Base64.html</title>
     <meta charset="utf-8" />
     <style>
-
         body {
             margin-top: 20px;
             margin-left: 10px;
@@ -33,19 +32,20 @@
 
             // https://stackoverflow.com/questions/623172/how-to-get-image-size-height-width-using-javascript#626505
             return new Promise(resolve => {
-                const img = new Image();
+                const img = new Image()
+                img.crossOrigin = "anonymous"
                 img.onload = function () {
-                    var canvas = document.createElement("canvas");
-                    canvas.width = this.width;
-                    canvas.height = this.height;
-                    var ctx = canvas.getContext("2d");
-                    ctx.drawImage(this, 0, 0);
-                    var dataURL = canvas.toDataURL("image/png");
+                    var canvas = document.createElement("canvas")
+                    canvas.width = this.width
+                    canvas.height = this.height
+                    var ctx = canvas.getContext("2d")
+                    ctx.drawImage(this, 0, 0)
+                    var dataURL = canvas.toDataURL("image/png")
 
                     resolve(dataURL)
                     return
                 }
-                img.src = url;
+                img.src = url
 
             })
 
