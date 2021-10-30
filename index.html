@@ -1,0 +1,63 @@
+<!-- https://stackoverflow.com/questions/22172604/convert-image-url-to-base64#22172860 -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Image URL to Base64.html</title>
+    <meta charset="utf-8" />
+    <style>
+
+        body {
+            margin-top: 20px;
+            margin-left: 10px;
+        }
+
+        label {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 7px;
+        }
+    </style>
+</head>
+
+
+<body>
+    <label for="enterURL">Image URL:</label>
+    <textarea style="font-size: 30px; height: 5em;" id="enterURL" cols="100" rows="1"></textarea>
+
+    <script>
+
+        var enterURL = document.getElementById("enterURL")
+
+        function getBase64ImageFromURL(url) {
+
+            // https://stackoverflow.com/questions/623172/how-to-get-image-size-height-width-using-javascript#626505
+            return new Promise(resolve => {
+                const img = new Image();
+                img.onload = function () {
+                    var canvas = document.createElement("canvas");
+                    canvas.width = this.width;
+                    canvas.height = this.height;
+                    var ctx = canvas.getContext("2d");
+                    ctx.drawImage(this, 0, 0);
+                    var dataURL = canvas.toDataURL("image/png");
+
+                    resolve(dataURL)
+                    return
+                }
+                img.src = url;
+
+            })
+
+        }
+
+        enterURL.onpaste = function () {
+            setTimeout(async function () {
+                console.log(await getBase64ImageFromURL(enterURL.value))
+            }, 1)
+        }
+
+    </script>
+</body>
+
+</html>
